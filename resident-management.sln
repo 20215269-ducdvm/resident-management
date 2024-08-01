@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "backend", "backend", "{F6EA103E-21B4-4E7B-A184-C82D59955D59}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "repository-pattern", "repository-pattern", "{1383A643-E632-40AC-85B7-2A3663F199C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResidentsApi", "backend\repository-pattern\ResidentsApi\ResidentsApi.csproj", "{EAD72607-0834-468D-B205-C6C6057727FB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EAD72607-0834-468D-B205-C6C6057727FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAD72607-0834-468D-B205-C6C6057727FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAD72607-0834-468D-B205-C6C6057727FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAD72607-0834-468D-B205-C6C6057727FB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {ED27DFC9-A8A6-4CE6-9D8E-B1A965B3F521}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1383A643-E632-40AC-85B7-2A3663F199C7} = {F6EA103E-21B4-4E7B-A184-C82D59955D59}
+		{EAD72607-0834-468D-B205-C6C6057727FB} = {1383A643-E632-40AC-85B7-2A3663F199C7}
+	EndGlobalSection
+EndGlobal

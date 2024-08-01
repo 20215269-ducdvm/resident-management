@@ -1,6 +1,0 @@
-@ResidentsApi_HostAddress = http://localhost:5100
-
-GET {{ResidentsApi_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
