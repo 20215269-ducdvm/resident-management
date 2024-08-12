@@ -16,9 +16,9 @@ namespace ResidentsApi.Controllers
     [ApiController]
     public class ResidentController : ControllerBase
     {
-        private UnitOfWork<ResidentDBContext> unitOfWork = new UnitOfWork<ResidentDBContext>();
-        private GenericRepository<Resident> genericRepository;
-        private IResidentRepository residentRepository;
+        private readonly UnitOfWork<ResidentDBContext> unitOfWork = new();
+        private readonly GenericRepository<Resident> genericRepository;
+        private readonly ResidentRepository residentRepository;
 
         public ResidentController()
         {
@@ -32,7 +32,7 @@ namespace ResidentsApi.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Resident>> GetResidents()
         {
-            var residents = genericRepository.GetAll();
+            var residents = genericRepository.GetAll();            
             return Ok(residents);
         }
 

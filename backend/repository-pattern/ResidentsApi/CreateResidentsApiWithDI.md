@@ -27,7 +27,7 @@ Các đối tượng của lớp A sẽ không tự tạo ra đối tượng ph�
 dotnet new webapi --use-controllers -o ResidentsApi
 ```
 
-Thêm chứng thư HTTPS để tăng độ tin cậy
+Thêm chứng thư HTTPS để tăng độ tin cậy (Optional)
 
 ```.NET CLI
 dotnet dev-certs https --trust
