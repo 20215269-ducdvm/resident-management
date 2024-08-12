@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+import * as React from "react";
 import { useState } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
@@ -6,8 +8,9 @@ import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
-import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
-import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
+import ApartmentIcon from '@mui/icons-material/Apartment';
+// import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
+// import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 // import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 // import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 // import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
@@ -15,7 +18,7 @@ import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 // import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
 // import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-// import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
+import FindInPageIcon from '@mui/icons-material/FindInPage';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -44,6 +47,9 @@ const Sidebar = () => {
   return (
     <Box
       sx={{
+        "& .pro-sidebar": {
+          // position: "fixed",          
+        },
         "& .pro-sidebar-inner": {
           background: `${colors.primary[400]} !important`,
         },
@@ -131,7 +137,7 @@ const Sidebar = () => {
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              Quản lý dân cư
+              Data
             </Typography>
             <Item
               title="Cư dân"
@@ -143,7 +149,14 @@ const Sidebar = () => {
             <Item
               title="Căn hộ"
               to="/apartments"
-              icon={<ContactsOutlinedIcon />}
+              icon={<ApartmentIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Cư dân - Căn hộ"
+              to="/residentapartments"
+              icon={<FindInPageIcon />}
               selected={selected}
               setSelected={setSelected}
             />
