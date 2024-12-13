@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ResidentsApi.Repository;
 using ResidentsApi.DAL;
 using ResidentsApi.GenericRepository;
@@ -24,7 +23,7 @@ namespace ResidentsApi.Controllers
         {
             // If you want to use Generic Repository with Unit of work
             genericRepository = new GenericRepository<Resident>(unitOfWork);
-            
+
             // If you want to use a Specific Repository with Unit of work
             residentRepository = new ResidentRepository(unitOfWork);
         }
@@ -32,37 +31,31 @@ namespace ResidentsApi.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Resident>> GetResidents()
         {
-            var residents = genericRepository.GetAll();            
+            var residents = genericRepository.GetAll();
             return Ok(residents);
         }
 
 
         [HttpGet("{id:long}")]
-        public ActionResult<Resident> GetResident(long id)
+        public ActionResult<Resident> GetResident(long id, [FromQuery] bool includeApartment = false)
         {
-            var residents = genericRepository.GetById(id);
-            return Ok(residents);
-        }
-
-        [HttpPut("{id:long}")]
-        public ActionResult<Resident> PutResident(long id, Resident resident)
-        {
-            if (id != resident.ResidentId)
+            Resident resident;
+            if (includeApartment)
             {
-                return BadRequest();
+                resident = residentRepository.GetResidentWithApartment(id);
             }
-            
-            if (ModelState.IsValid)
+            else
             {
-                genericRepository.Update(resident);
-                unitOfWork.Save();
-
-                return RedirectToAction("Index", "Resident");
+                resident = genericRepository.GetById(id);
             }
 
-            return BadRequest(ModelState);
-        }
+            if (resident == null)
+            {
+                return NotFound();
+            }
 
+            return Ok(resident);
+        }
         [HttpPost]
         public ActionResult<Resident> PostResident(Resident resident)
         {
@@ -75,7 +68,7 @@ namespace ResidentsApi.Controllers
                     genericRepository.Insert(resident);
                     unitOfWork.Save();
                     unitOfWork.Commit();
-                    return RedirectToAction("Index", "Resident");
+                    return CreatedAtAction(nameof(GetResident), new { id = resident.ResidentId }, resident);
                 }
 
                 return BadRequest(ModelState);
@@ -85,6 +78,25 @@ namespace ResidentsApi.Controllers
                 unitOfWork.Rollback();
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
+        }
+
+        [HttpPut("{id:long}")]
+        public ActionResult<Resident> PutResident(long id, Resident resident)
+        {
+            if (id != resident.ResidentId)
+            {
+                return BadRequest();
+            }
+
+            if (ModelState.IsValid)
+            {
+                genericRepository.Update(resident);
+                unitOfWork.Save();
+
+                return NoContent();
+            }
+
+            return BadRequest(ModelState);
         }
 
         [HttpDelete("{id:long}")]
@@ -99,13 +111,20 @@ namespace ResidentsApi.Controllers
 
             genericRepository.Delete(model);
             unitOfWork.Save();
-            return RedirectToAction("Index", "Resident");
+            return NoContent();
         }
 
-        [HttpGet("{name}")]
+        [HttpGet("name/{name}")]
         public ActionResult<IEnumerable<Resident>> GetResidentsByName(string name)
         {
             var residents = residentRepository.GetResidentsByName(name);
+            return Ok(residents);
+        }
+
+        [HttpGet("phone/{phoneNumber}")]
+        public ActionResult<IEnumerable<Resident>> GetResidentByPhoneNumber(string phoneNumber)
+        {
+            var residents = residentRepository.GetResidentByPhoneNumber(phoneNumber);
             return Ok(residents);
         }
     }

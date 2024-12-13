@@ -71,15 +71,23 @@ namespace ResidentsApi.Migrations
 
             modelBuilder.Entity("ResidentsApi.DAL.ResidentApartment", b =>
                 {
-                    b.Property<long>("ResidentId")
+                    b.Property<long>("ResidentApartmentId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("ResidentApartmentId"));
 
                     b.Property<long>("ApartmentId")
                         .HasColumnType("bigint");
 
-                    b.HasKey("ResidentId", "ApartmentId");
+                    b.Property<long>("ResidentId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("ResidentApartmentId");
 
                     b.HasIndex("ApartmentId");
+
+                    b.HasIndex("ResidentId");
 
                     b.ToTable("ResidentApartments");
                 });

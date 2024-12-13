@@ -5,14 +5,14 @@ namespace ResidentsApi.DAL
     {
         // Constructor that will be used in the DI container
         // [ActivatorUtilitiesConstructor]
-        
+
         // public ResidentDBContext(DbContextOptions<ResidentDBContext> options) 
         //     : base(options)
         // {
         // }
 
         // Constructor that will be used in Unit of Work
-        public ResidentDBContext() 
+        public ResidentDBContext()
             : base()
         {
         }
@@ -29,7 +29,7 @@ namespace ResidentsApi.DAL
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ResidentApartment>()
-                .HasKey(ra => new { ra.ResidentId, ra.ApartmentId });
+                .HasKey(ra => new { ra.ResidentApartmentId });
 
             modelBuilder.Entity<ResidentApartment>()
                 .HasOne(ra => ra.Resident)

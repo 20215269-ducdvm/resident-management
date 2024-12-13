@@ -31,7 +31,7 @@ namespace ResidentsApi.UnitOfWork
             GC.SuppressFinalize(this);
         }
 
-        //The Context property will return the DBContext object i.e. (EmployeeDBContext) object
+        //The Context property will return the DBContext object i.e. (ResidentDBContext) object
         //This Property is declared inside the Parent Interface and Initialized through the Constructor
         public TContext Context { get; }
 

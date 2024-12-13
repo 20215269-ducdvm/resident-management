@@ -3,37 +3,80 @@ import { Box, useTheme } from "@mui/material";
 import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import CustomDataGrid from "../../components/CustomDataGrid";
-import { mockDataResidentApartments } from '../../data/mockData';
-
+import { DataContext, RowContext } from "../../context/DataContext";
+import axios from "axios";
 const ResidentApartments = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+    const { data, updateData } = React.useContext(DataContext);
+    const { rows } = React.useContext(RowContext);    
     const columns = [
+        {
+            field: "id",
+            headerName: "residentApartmentId",
+            flex: 1,
+        },
         {
             field: "residentId",
             headerName: "residentId",
-            flex: 1,            
-            editable: true,
+            flex: 1,
         },
         {
             field: "apartmentId",
             headerName: "apartmentId",
-            flex: 1,            
-            editable: true,
+            flex: 1,
         },
     ];
 
-    const rowData = (residentApartment, id) => ({
-        id: id,
-        residentId: residentApartment.residentId,
-        apartmentId: residentApartment.apartmentId,
-    });
+    const handleRowChange = (updatedRows) => {
+        updateData('residentApartments', updatedRows);
+    }
 
-    let currentId = 0;
-    const rowsData = mockDataResidentApartments.map((residentApartment) => {
-        currentId += 1;
-        return rowData(residentApartment, currentId);
-    });
+    const saveDataToServer = (residentApartment) => {
+        switch (residentApartment.status) {
+            // case 'Created':
+            //   residentApartment = { ...residentApartment, residentApartments: [] };
+            //   axios.post('http://localhost:5100/api/ResidentApartment', residentApartment)
+            //     .then((response) => {
+            //       console.log('Create response:', response.data);
+            //     })
+            //     .catch((error) => {
+            //       console.error(error);
+            //     });
+            //   break;
+            // case 'Updated':
+            //   axios.put(`http://localhost:5100/api/ResidentApartment/${residentApartment.residentapartmentId}`, residentApartment)
+            //     .then((response) => {
+            //       console.log('Update response:', response.data);
+            //     })
+            //     .catch((error) => {
+            //       console.error(error);
+            //     });
+            //   break;
+            case 'Deleted':
+                axios.delete(`http://localhost:5100/api/ResidentApartment/${residentApartment.id}`)
+                    .then((response) => {
+                        console.log('Delete response:', response.data);
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+                break;
+            default:
+                break;
+        }
+    }
+
+    const handleSaveData = () => {
+        const userConfirmed = window.confirm('Bạn có chắc muốn lưu dữ liệu không?');
+        if (!userConfirmed) {
+            return;
+        }
+
+        data.residentApartments.forEach((residentApartment) => {
+            saveDataToServer(residentApartment);
+        });
+    }
 
     return (
         <Box m="20px">
@@ -79,8 +122,11 @@ const ResidentApartments = () => {
                 }}
             >
                 <CustomDataGrid
-                    initialRows={rowsData}
+                    entity="residentapartment"
+                    initialRows={rows.residentApartmentRows}
                     columns={columns}
+                    onRowsChange={handleRowChange}
+                    handleClickSaveData={handleSaveData}
                 />
             </Box>
         </Box>

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import * as React from "react";
 import { Box, useTheme } from "@mui/material";
 import Header from "../../components/Header";

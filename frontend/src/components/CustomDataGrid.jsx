@@ -7,54 +7,45 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import SaveIcon from '@mui/icons-material/Save';
-import CancelIcon from '@mui/icons-material/Close';
+// import CancelIcon from '@mui/icons-material/Close';
+import { Typography } from "@mui/material";
 import {
-    GridRowModes,
+    // GridRowModes,
     DataGrid,
     GridToolbar,
     GridToolbarContainer,
     GridActionsCellItem,
-    GridRowEditStopReasons,
+    // GridRowEditStopReasons,
 } from '@mui/x-data-grid';
 import { useTheme } from "@mui/material";
 import { tokens } from "../theme";
-
-function ExtractColumns(columns) {
-    return columns.map((column) => {
-        const { field } = column;
-        return { [field]: '' };
-    });
-}
-
-const CustomDataGrid = ({ initialRows, columns }) => {
+import { useNavigate } from 'react-router-dom';
+const CustomDataGrid = ({ entity, initialRows, columns, onRowsChange, handleClickSaveData }) => {
     const [rows, setRows] = React.useState(initialRows);
     const [rowModesModel, setRowModesModel] = React.useState({});
-    const [commands, setCommands] = React.useState('');
-    const [id, setLastID] = React.useState(rows.length + 1);
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
+    const navigate = useNavigate();
+    React.useEffect(() => {
+        setRows(initialRows);
+    }, [initialRows]);
 
-    function EditToolbar(props) {
-        const { setRows, setRowModesModel } = props;
+    React.useEffect(() => {
+        onRowsChange(rows);
+    }, [rows, onRowsChange]);
 
+    function EditToolbar() {
         const theme = useTheme();
         const colors = tokens(theme.palette.mode);
-        
 
-        const handleClickAddRow = () => {        
-            setLastID((oldID) => oldID + 1);
-            setRows((oldRows) => [...oldRows, { id, ...ExtractColumns(columns), isNew: true }]);
-            setRowModesModel((oldModel) => ({
-                ...oldModel,
-                [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
-            }));            
+
+        const handleClickAddRow = () => {
+            console.log('entity:', entity);
+            if (entity === 'resident') navigate('/residentform');
+            else if (entity === 'apartment') navigate('/apartmentform');
+            else if (entity === 'residentapartment') navigate('/residentapartmentform');
         };
 
-        const handleClickSaveData = () => {
-            const userConfirmed = window.confirm('Bạn có chắc muốn lưu dữ liệu không?');
-            if (userConfirmed) {
-                // Save the data
-                console.log(commands);
-            }
-        }
         return (
             <GridToolbarContainer style={{ display: 'flex', justifyContent: 'space-between' }}  >
                 <GridToolbar />
@@ -66,7 +57,7 @@ const CustomDataGrid = ({ initialRows, columns }) => {
                     },
                 }}>
                     <Button variant="contained" sx={{ borderRadius: "20px" }} startIcon={<AddIcon />} onClick={handleClickAddRow}>
-                        Thêm bản ghi
+                        Thêm
                     </Button>
                     <Button variant="contained" sx={{ borderRadius: "20px" }} startIcon={<SaveIcon />} onClick={handleClickSaveData}>
                         Lưu
@@ -76,36 +67,55 @@ const CustomDataGrid = ({ initialRows, columns }) => {
         );
     }
 
-    const handleRowEditStop = (params, event) => {
-        if (params.reason === GridRowEditStopReasons.rowFocusOut) {
-            event.defaultMuiPrevented = true;
-        }
-    };
+    // const handleRowEditStop = (params, event) => {
+    //     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
+    //         event.defaultMuiPrevented = true;
+    //     }
+    // };
 
     const handleEditClick = (id) => () => {
-        setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
-    };
-
-    const handleSaveClick = (id) => () => {
-        setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
-    };
-
-    const handleDeleteClick = (id) => () => {
-        setRows(rows.filter((row) => row.id !== id));
-        setCommands((prevCommands) => prevCommands + 'd')
-    };
-
-    const handleCancelClick = (id) => () => {
-        setRowModesModel({
-            ...rowModesModel,
-            [id]: { mode: GridRowModes.View, ignoreModifications: true },
-        });
-
-        const editedRow = rows.find((row) => row.id === id);
-        if (editedRow.isNew) {
-            setRows(rows.filter((row) => row.id !== id));
+        // setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
+        switch (entity) {
+            case 'resident':
+                navigate('/residentformedit?id=' + id);
+                break;
+            case 'apartment':
+                navigate('/apartmentformedit?id=' + id);
+                break;
+            case 'residentapartment':
+                navigate('/residentapartmentformedit?id=' + id);
+                break;
+            default:
+                break;
         }
     };
+
+    // const handleSaveClick = (id) => () => {
+    //     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
+
+    // const editedRow = rows.find((row) => row.id === id);
+    // if (editedRow.isNew) {
+    //     setRows(rows.map((row) => (row.id === id ? { ...row, status: "Created", isNew: false } : row)));
+    // } else {
+    //     setRows(rows.map((row) => (row.id === id ? { ...row, status: "Updated" } : row)));
+    // }
+    // };
+
+    const handleDeleteClick = (id) => () => {
+        setRows(rows.map((row) => (row.id === id ? { ...row, status: "Deleted" } : row)));
+    };
+
+    // const handleCancelClick = (id) => () => {
+    //     setRowModesModel({
+    //         ...rowModesModel,
+    //         [id]: { mode: GridRowModes.View, ignoreModifications: true },
+    //     });
+
+    //     const editedRow = rows.find((row) => row.id === id);
+    //     if (editedRow.isNew) {
+    //         setRows(rows.filter((row) => row.id !== id));
+    //     }
+    // };
 
     const processRowUpdate = (newRow) => {
         const updatedRow = { ...newRow, isNew: false };
@@ -117,6 +127,41 @@ const CustomDataGrid = ({ initialRows, columns }) => {
         setRowModesModel(newRowModesModel);
     };
 
+    const statusColumn = [
+        {
+            field: 'status',
+            headerName: 'Trạng thái',
+            headerAlign: 'center',
+            width: 100,
+            renderCell: ({ row: { status } }) => {
+                return (
+                    <Box
+                        width="80%"
+                        m="10px"
+                        p="5px"
+                        display="flex"
+                        justifyContent="center"
+                        backgroundColor={
+                            status === "Created"
+                                ? colors.greenAccent[600]
+                                : status === "Updated"
+                                    ? colors.blueAccent[700]
+                                    : status === "Deleted"
+                                        ? colors.redAccent[700]
+                                        : colors.grey[700]
+                        }
+                        borderRadius="20px"
+                    >
+
+                        <Typography color={colors.grey[100]}>
+                            {status}
+                        </Typography>
+                    </Box>
+                );
+            },
+        },
+    ];
+
     const actionColumn = [
         {
             field: 'actions',
@@ -125,27 +170,26 @@ const CustomDataGrid = ({ initialRows, columns }) => {
             width: 100,
             cellClassName: 'actions',
             getActions: ({ id }) => {
-                const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-
-                if (isInEditMode) {
-                    return [
-                        <GridActionsCellItem
-                            icon={<SaveIcon />}
-                            label="Save"
-                            sx={{
-                                color: 'primary.main',
-                            }}
-                            onClick={handleSaveClick(id)}
-                        />,
-                        <GridActionsCellItem
-                            icon={<CancelIcon />}
-                            label="Cancel"
-                            className="textPrimary"
-                            onClick={handleCancelClick(id)}
-                            color="inherit"
-                        />,
-                    ];
-                }
+                // const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+                // if (isInEditMode) {
+                //     return [
+                //         <GridActionsCellItem
+                //             icon={<SaveIcon />}
+                //             label="Save"
+                //             sx={{
+                //                 color: 'primary.main',
+                //             }}
+                //             onClick={handleSaveClick(id)}
+                //         />,
+                //         <GridActionsCellItem
+                //             icon={<CancelIcon />}
+                //             label="Cancel"
+                //             className="textPrimary"
+                //             onClick={handleCancelClick(id)}
+                //             color="inherit"
+                //         />,
+                //     ];
+                // }
 
                 return [
                     <GridActionsCellItem
@@ -166,7 +210,7 @@ const CustomDataGrid = ({ initialRows, columns }) => {
         },
     ];
 
-    const updatedColumns = Array.isArray(columns) ? [...columns, ...actionColumn] : [...actionColumn];
+    const updatedColumns = [...columns, ...statusColumn, ...actionColumn];
 
     return (
         <Box
@@ -187,7 +231,7 @@ const CustomDataGrid = ({ initialRows, columns }) => {
                 editMode="row"
                 rowModesModel={rowModesModel}
                 onRowModesModelChange={handleRowModesModelChange}
-                onRowEditStop={handleRowEditStop}
+                // onRowEditStop={handleRowEditStop}
                 processRowUpdate={processRowUpdate}
                 slots={{
                     toolbar: EditToolbar,

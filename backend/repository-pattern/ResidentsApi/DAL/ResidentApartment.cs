@@ -2,6 +2,7 @@ namespace ResidentsApi.DAL
 {
     public class ResidentApartment
     {
+        public long ResidentApartmentId { get; set; }
         public long ResidentId { get; set; }
         public Resident? Resident { get; set; }
         

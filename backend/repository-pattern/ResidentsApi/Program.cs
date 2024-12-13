@@ -6,16 +6,17 @@ using ResidentsApi.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+    });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Add the DbContext to the container
-// builder.Services.AddDbContext<ResidentDBContext>(options =>
-//     options.UseNpgsql(builder.Configuration.GetConnectionString("ResidentDBLocalConnection")));
-
 builder.Services.AddDbContext<ResidentDBContext>();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -33,13 +34,12 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowLocalhost3000",
         policy =>
         {
-            policy.WithOrigins("http://localhost:3000/residents",
-                                "http://localhost:3000/apartments",
-                                "http://localhost:3000/residentapartments")
-                   .AllowAnyHeader() 
+            policy.WithOrigins("http://localhost:3000")
+                   .AllowAnyHeader()
                    .AllowAnyMethod();
         });
 });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -64,48 +64,47 @@ using (var scope = app.Services.CreateScope())
     DbInitializer.Initialize(context);
 }
 
-
 app.UseHttpsRedirection();
 
-app.UseRouting();
+app.UseRouting(); // Route matching happens here
 
-app.UseCors("AllowLocalhost3000");
+app.UseCors("AllowLocalhost3000"); // Apply CORS policy
 
-app.UseAuthorization();
+// Custom middleware for handling OPTIONS requests
+// app.Use(async (context, next) =>
+// {
+//     if (context.Request.Method == "OPTIONS")
+//     {
+//         context.Response.Headers.Append("Access-Control-Allow-Origin", "http://localhost:3000");
+//         context.Response.Headers.Append("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+//         context.Response.Headers.Append("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//         context.Response.StatusCode = 204; // No Content
+//         return;
+//     }
+
+//     await next(); // Continue to the next middleware
+// });
+
+// app.Use(async (context, next) =>
+// {
+//     context.Response.Headers.Append("Access-Control-Allow-Origin", "http://localhost:3000");
+//     context.Response.Headers.Append("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+//     context.Response.Headers.Append("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//     await next();
+// });
+
+app.UseAuthorization(); // Authorization checks happen here
 
 app.MapControllers();
 
-app.Use(async (context, next) =>
-{
-    if (context.Request.Method == "OPTIONS")
-    {
-        context.Response.Headers.Append("Access-Control-Allow-Origin", "http://localhost:3000");
-        context.Response.Headers.Append("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        context.Response.Headers.Append("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        context.Response.StatusCode = 204; // No Content
-        return;
-    }
-
-    await next();
-});
-
-app.Use(async (context, next) =>
-{
-    context.Response.Headers.Append("Access-Control-Allow-Origin", "http://localhost:3000");
-    context.Response.Headers.Append("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    context.Response.Headers.Append("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    await next.Invoke();
-});
-
-app.Use(async (context, next) =>
-{
-    await next.Invoke();
-
-    // Log response headers
-    foreach (var header in context.Response.Headers)
-    {
-        Console.WriteLine($"{header.Key}: {header.Value}");
-    }
-});
+// Middleware to log response headers after the request is handled
+// app.Use(async (context, next) =>
+// {
+//     await next.Invoke();
+//     foreach (var header in context.Response.Headers)
+//     {
+//         Console.WriteLine($"{header.Key}: {header.Value}");
+//     }
+// });
 
 app.Run();

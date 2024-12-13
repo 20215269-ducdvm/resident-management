@@ -1,6 +1,7 @@
 using ResidentsApi.DAL;
 using ResidentsApi.GenericRepository;
 using ResidentsApi.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
 namespace ResidentsApi.Repository
 {
     public class ApartmentRepository : GenericRepository<Apartment>, IApartmentRepository
@@ -14,5 +15,16 @@ namespace ResidentsApi.Repository
         // public ApartmentRepository(ResidentDBContext context) : base(context)
         // {
         // }
+        //Add the Specific Methods for the Apartment Repository
+
+        public Apartment GetApartmentWithResident(long id)
+        {
+            return Context.Apartments.Include(a => a.ResidentApartments).FirstOrDefault(a => a.ApartmentId == id);
+        }
+
+        public Apartment GetApartmentByRoomNumber(string roomNumber)
+        {
+            return Context.Apartments.FirstOrDefault(a => a.RoomNumber.Equals(roomNumber));
+        }
     }
 }

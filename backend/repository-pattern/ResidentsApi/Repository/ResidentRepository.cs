@@ -1,6 +1,7 @@
 using ResidentsApi.DAL;
 using ResidentsApi.GenericRepository;
 using ResidentsApi.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
 namespace ResidentsApi.Repository
 {
     public class ResidentRepository : GenericRepository<Resident>, IResidentRepository
@@ -17,11 +18,15 @@ namespace ResidentsApi.Repository
         //Add the Specific Methods for the Resident Repository
         public IEnumerable<Resident> GetResidentsByName(string name)
         {
-            return Context.Residents.Where(r => r.Name == name).ToList();
+            return [.. Context.Residents.Where(r => r.Name == name)];
         }
         public IEnumerable<Resident> GetResidentByPhoneNumber(string phoneNumber)
         {
-            return Context.Residents.Where(r => r.PhoneNumber == phoneNumber).ToList();
+            return [.. Context.Residents.Where(r => r.PhoneNumber == phoneNumber)];
+        }
+        public Resident GetResidentWithApartment(long id)
+        {
+            return Context.Residents.Include(r => r.ResidentApartments).FirstOrDefault(r => r.ResidentId == id);            
         }
     }
 }
